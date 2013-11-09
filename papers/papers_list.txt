@@ -1,0 +1,32 @@
+
+http://www.chrisharrison.net/
+http://johnnylee.net/projects/wii/
+http://users.ece.cmu.edu/~agr/
+
+Links
+-----
+
+http://www.glacialwanderer.com/hobbyrobotics/?p=261
+http://www.loveelectronics.co.uk/Tutorials/12/adxl345-accelerometer-arduino-tutorial
+Galaxy S4 sensors
+http://www.androidguys.com/wp-content/uploads/2013/04/samsung-s4-sensors.jpg
+
+UCI Machine Learning repository dataset
+---------------------------------------
+
+http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+http://archive.ics.uci.edu/ml/datasets/Wearable+Computing%3A+Classification+of+Body+Postures+and+Movements+(PUC-Rio)
+http://archive.ics.uci.edu/ml/datasets/Daily+and+Sports+Activities+Dataset
+http://archive.ics.uci.edu/ml/datasets/OPPORTUNITY+Activity+Recognition
+
+Kaggle dataset
+--------------
+http://www.kaggle.com/c/accelerometer-biometric-competition
+
+Tanzeem Choudhury - Mobile Sensing Platform paper author
+http://www.cs.dartmouth.edu/~tanzeem/teaching/CS188-Fall08/dataset.html
+
+Labs
+----
+http://www.cs.unc.edu/~tracker/ref/s2001/tracker/ - Superb site with the SIGGRAPH material.
+https://sites.google.com/site/smartlabunige/
