@@ -78,15 +78,18 @@ features = [genSingleMatFeatures(bax), ...
     genSingleMatFeatures(mJBa), ...
     genSingleMatFeatures(mBg), ...
     genSingleMatFeatures(mJBg)];
-
-%entropy(): Signal entropy
-%arCoeff(): Autorregresion coefficients with Burg order equal to 4
 %maxInds(): index of the frequency component with largest magnitude
+   % max(mat, [], 2) of fft
 %meanFreq(): Weighted average of the frequency components to obtain a mean frequency
+   % mean(mat, [], 2) of fft
 %skewness(): skewness of the frequency domain signal 
+   %skewness(mat, [], 2) of fft
 %kurtosis(): kurtosis of the frequency domain signal 
+   % kurtosis(mat, [], 2) of fft
+   
 %bandsEnergy(): Energy of a frequency interval within the 64 bins of the FFT of each window.
 %correlation(): correlation coefficient between two signals
+
    sma(bax, bay, baz);
    angle(bax, bay);
 end
@@ -100,7 +103,9 @@ feat = horzcat(...
    max(mat,[],2), ...
    min(mat,[],2), ...
    energy(mat), ...
-   iqr(mat,2));
+   iqr(mat,2), ...
+   signalEntropy(mat),...
+   arCoefByRow(mat));
 end
 
 function [ret] = sma(x,y,z)
@@ -126,4 +131,20 @@ end
 function [ret] = mag(x, y, z)
 % Returns the matrix that gives the magnitude pointwise
    ret = sqrt(x.^2 + y.^2 + z.^2);
+end
+
+function [ret] = signalEntropy(x)
+%Returns the entropy of a signal
+   hisP = hist(x', 25)';
+   numrows = size(hisP,1);
+   hisP(~hisP) = 1;
+   hisP = spdiags(1./sum(hisP,2),0,numrows,numrows)*hisP;
+   ret = -sum(hisP.*log2(hisP) ,2);
+end
+
+function [ret] = arCoefByRow(x)
+   C = num2cell(x,2);             
+   ret = cellfun(@(a) arburg(a,4),C, 'UniformOutput', false);
+   ret = cell2mat(ret);
+   ret = ret(:,2:5);
 end
