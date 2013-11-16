@@ -7,21 +7,88 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.app.Activity;
-import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 
-public class MainActivity extends Activity implements SensorEventListener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends Activity {
 
     private SensorManager mSensorManager;
-    private Sensor mSensor;
+
+    private Sensor mTotalAccelSensor;
+    private Sensor mGravitySensor;
+    private Sensor mLinearAccelSensor;
+    private Sensor mGyroSensor;
+
+    private MainActivity.SensorListener mTotalAccListener;
+    private MainActivity.SensorListener mGravityListener;
+    private MainActivity.SensorListener mLinearAccelListener;
+    private MainActivity.SensorListener mGyroListener;
+
+    private List<Reading> totalAccelerationReadings;
+    private List<Reading> gravityReadings;
+    private List<Reading> linearAccelerationReadings;
+    private List<Reading> gyroReadings;
+
+    private Button mWriteSensorDataButton;
+
+    class Reading {
+        float x;
+        float y;
+        float z;
+
+        public Reading(float[] values) {
+            this.x = values[0];
+            this.y = values[1];
+            this.z = values[2];
+        }
+    }
+
+    /*
+     * For a sampling rate of 50Hz, we take 50 readings per second. So to
+     * store data for 10 minutes, we need to store
+     *
+     *  10 * 60 * 50 = 30k readings.
+     *
+     * We store x,y,z for totalAccel, gravity, linearAccel, gyro. So we need
+     *
+     *  4 * 3 * 30k * 8 / (10 ^ 6) = 2.88 MB
+     *
+     *  So let's just store it in memory shall we :-)
+     */
+
+    /*
+     * Sampling Rate : 50Hz
+     * 1 / 50 * ( 10 ^ 6 ) = 20k microseconds
+     */
+    private int SAMPLING_RATE = 20000;
+
+    /*
+     * Number of readings to include in a window.
+     */
+    private int WINDOW_SIZE = 128;
+
+    /*
+     * Number of readings from previous window to
+     * incorporate into current window.
+     *  In percentage (0-100)
+     */
+    private int OVERLAP = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scrapeSensor();
+        mWriteSensorDataButton = (Button)findViewById(R.id.writeSensorDataButton);
+
+        this.totalAccelerationReadings = new ArrayList<Reading>();
+        this.gravityReadings = new ArrayList<Reading>();
+        this.linearAccelerationReadings = new ArrayList<Reading>();
+        this.gyroReadings = new ArrayList<Reading>();
     }
 
 
@@ -32,24 +99,61 @@ public class MainActivity extends Activity implements SensorEventListener {
         return true;
     }
 
-    private void scrapeSensor() {
+    class SensorListener implements SensorEventListener {
+        private final List<Reading> readingList;
+
+        public SensorListener(List<Reading> readingList) {
+            this.readingList = readingList;
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            this.readingList.add(new Reading(event.values));
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    }
+
+    private void startScraping() {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        mTotalAccelSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mTotalAccListener = new SensorListener(totalAccelerationReadings);
+        mSensorManager.registerListener(mTotalAccListener, mTotalAccelSensor, SAMPLING_RATE);
+
+        mGravitySensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+        mGravityListener = new SensorListener(gravityReadings);
+        mSensorManager.registerListener(mGravityListener, mGravitySensor, SAMPLING_RATE);
+
+        mLinearAccelSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        mLinearAccelListener = new SensorListener(linearAccelerationReadings);
+        mSensorManager.registerListener(mLinearAccelListener, mLinearAccelSensor, SAMPLING_RATE);
+
+        mGyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        mGyroListener = new SensorListener(gyroReadings);
+        mSensorManager.registerListener(mGyroListener, mGyroSensor, SAMPLING_RATE);
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
+    public void startStopClick(View view) {
+        Button startStopButton = (Button) view;
 
-        Log.i("Accelerometer-X/Y/Z:", String.format("%f -- %f -- %f", x, y, z));
+        if (startStopButton.getText().toString().equalsIgnoreCase("start")) {
+            startStopButton.setText("STOP");
+            startScraping();
+            mWriteSensorDataButton.setEnabled(false);
+        } else {
+            startStopButton.setText("START");
+            mWriteSensorDataButton.setEnabled(true);
+            stopScraping();
+        }
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    private void stopScraping() {
+        mSensorManager.unregisterListener(mTotalAccListener);
+        mSensorManager.unregisterListener(mGravityListener);
+        mSensorManager.unregisterListener(mLinearAccelListener);
+        mSensorManager.unregisterListener(mGyroListener);
     }
-
 }
