@@ -1,16 +1,24 @@
 package com.rollingphones.sensorscraper;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +42,7 @@ public class MainActivity extends Activity {
     private List<Reading> gyroReadings;
 
     private Button mWriteSensorDataButton;
+    private String newLine;
 
     class Reading {
         float x;
@@ -83,12 +92,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        newLine = System.getProperty("line.separator");
+
         mWriteSensorDataButton = (Button)findViewById(R.id.writeSensorDataButton);
 
-        this.totalAccelerationReadings = new ArrayList<Reading>();
-        this.gravityReadings = new ArrayList<Reading>();
-        this.linearAccelerationReadings = new ArrayList<Reading>();
-        this.gyroReadings = new ArrayList<Reading>();
+        System.out.println("LOG_CHK : " + this.getFilesDir());
     }
 
 
@@ -118,6 +126,11 @@ public class MainActivity extends Activity {
 
     private void startScraping() {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        totalAccelerationReadings = new ArrayList<Reading>();
+        gravityReadings = new ArrayList<Reading>();
+        linearAccelerationReadings = new ArrayList<Reading>();
+        gyroReadings = new ArrayList<Reading>();
 
         mTotalAccelSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mTotalAccListener = new SensorListener(totalAccelerationReadings);
@@ -155,5 +168,62 @@ public class MainActivity extends Activity {
         mSensorManager.unregisterListener(mGravityListener);
         mSensorManager.unregisterListener(mLinearAccelListener);
         mSensorManager.unregisterListener(mGyroListener);
+    }
+
+    public void writeSensorData(View view) throws IOException {
+        int numReadings = Math.min(Math.min(totalAccelerationReadings.size(), gravityReadings.size()),
+                Math.min(linearAccelerationReadings.size(), gyroReadings.size()));
+
+        File path = Environment.getExternalStoragePublicDirectory("sensor_scraper");
+        path.mkdirs();
+
+        List<FileOutputStream> fileStreams = new ArrayList<FileOutputStream>();
+        fileStreams.add(new FileOutputStream(new File(path, "total_acc_x.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "total_acc_y.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "total_acc_z.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "body_acc_x.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "body_acc_y.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "body_acc_z.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_x.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_y.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_z.txt")));
+
+        int incrementCount = OVERLAP * WINDOW_SIZE / 100;
+        for (int i = 0; i + WINDOW_SIZE < numReadings - 1; i += incrementCount) {
+            writeToFileStreams(totalAccelerationReadings.subList(i, i + WINDOW_SIZE), fileStreams.subList(0, 3));
+            writeToFileStreams(linearAccelerationReadings.subList(i, i + WINDOW_SIZE), fileStreams.subList(3, 6));
+            writeToFileStreams(gyroReadings.subList(i, i + WINDOW_SIZE), fileStreams.subList(6, fileStreams.size()));
+        }
+
+        for (FileOutputStream fs : fileStreams) fs.close();
+
+        mWriteSensorDataButton.setEnabled(false);
+    }
+
+    private void writeToFileStreams(List<Reading> readings, List<FileOutputStream> fileStreams) throws IOException {
+        List<String> readingStrings = getStringFromList(readings);
+        for(int i = 0; i < fileStreams.size(); i++) {
+            fileStreams.get(i).write(readingStrings.get(i).getBytes());
+        }
+    }
+
+    private List<String> getStringFromList(List<Reading> readings) {
+        List<StringBuffer> stringBuffers = new ArrayList<StringBuffer>();
+        for (int i = 0; i < 3; i++) {
+            stringBuffers.add(new StringBuffer());
+        }
+
+        for (int i = 0; i < readings.size(); i++) {
+            stringBuffers.get(0).append("" + readings.get(i).x + " ");
+            stringBuffers.get(1).append("" + readings.get(i).y + " ");
+            stringBuffers.get(2).append("" + readings.get(i).z + " ");
+        }
+
+        List<String> strings = new ArrayList<String>();
+        for (int i = 0; i < 3; i++) {
+            strings.add(stringBuffers.get(i).toString().trim() + newLine);
+        }
+
+        return strings;
     }
 }
