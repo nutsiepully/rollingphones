@@ -8,10 +8,16 @@ XgenTest = genFeatures(baxtest, baytest, baztest, bgxtest, bgytest, ...
 
 
         
-SVMStruct = libsvmtrain(Ytrain, XgenTrain, '-t 2');
-Group = libsvmpredict(Ytest ,XgenTest,SVMStruct);
+SVMStruct = libsvmtrain(Ytrain, XgenTrain);
+Group = libsvmpredict(Ytrain ,XgenTrain,SVMStruct);
+Group2 = libsvmpredict(Ytest ,XgenTest,SVMStruct);
 
 
   
-SVMStruct2 = libsvmtrain(Ytrain, Xtrain, '-t 2');
-Group2 = libsvmpredict(Ytest ,Xtest,SVMStruct2);
+SVMStruct2 = libsvmtrain(Ytrain, Xtrain);
+Group3 = libsvmpredict(Ytest ,Xtest,SVMStruct2);
+
+
+Group(2)
+Group2(2)
+Group3(2)
