@@ -30,3 +30,7 @@ Labs
 ----
 http://www.cs.unc.edu/~tracker/ref/s2001/tracker/ - Superb site with the SIGGRAPH material.
 https://sites.google.com/site/smartlabunige/
+
+sensors-10.pdf - referred in UCI data repo. Contains examples of runs
+against multiple algorithms.
+

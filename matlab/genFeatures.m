@@ -136,6 +136,8 @@ features = [
     % mean(mat, [], 2) of fft   
     %bandsEnergy(): Energy of a frequency interval within the 64 bins of the FFT of each window.
     % sma(bax, bay, baz);    
+    
+    features = normalize(features);
 end
 
 function [feat] = genSingleMatFeatures(mat)
