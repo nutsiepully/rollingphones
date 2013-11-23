@@ -203,34 +203,3 @@ feat = horzcat(...
    iqr(mat,2), ...
    signalEntropy(mat));
 end
-
-function [ret] = sma(x,y,z)
-%Signal magnitude area
-   ret = mean(abs(x)+abs(y)+abs(z), 2);
-end
-
-function [ret] = energy(a)
-%Energy measure. Sum of the squares divided by the number of values. 
-   ret = mean((a.*a),2);
-end
-
-function [ang] = angle(a,b)
-% Angle between two vectors, should be done row by row
-ang = acosd(dot(a,b,2)./(rowNorm(a) .* rowNorm(b)));
-end
-
-function [rnorm] = rowNorm(a)
-% Takes the norm of each row 
-   rnorm = sqrt(sum(abs(a).^2,2));
-end
-
-function [ret] = mag(x, y, z)
-% Returns the matrix that gives the magnitude pointwise
-   ret = sqrt(x.^2 + y.^2 + z.^2);
-end
-
-
-function [ret] = bandsEnergy(x)
-
-
-end
