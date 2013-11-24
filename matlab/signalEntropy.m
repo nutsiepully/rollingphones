@@ -1,8 +1,5 @@
 function [ret] = signalEntropy(x)
-%Returns the entropy of a signal
-   hisP = hist(x', 25)';
-   numrows = size(hisP,1);
-   hisP(~hisP) = 1;
-   hisP = spdiags(1./sum(hisP,2),0,numrows,numrows)*hisP;
-   ret = -sum(hisP.*log2(hisP) ,2);
+   C = num2cell(x,2);
+   ret = cellfun(@entropy, C, 'UniformOutput', false);
+   ret = cell2mat(ret);
 end
