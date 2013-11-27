@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends Activity {
@@ -41,8 +42,10 @@ public class MainActivity extends Activity {
     private List<Reading> linearAccelerationReadings;
     private List<Reading> gyroReadings;
 
-    private Button mWriteSensorDataButton;
     private String newLine;
+
+    private boolean onState;
+    private List<Button> activityButtons;
 
     class Reading {
         float x;
@@ -94,9 +97,15 @@ public class MainActivity extends Activity {
 
         newLine = System.getProperty("line.separator");
 
-        mWriteSensorDataButton = (Button)findViewById(R.id.writeSensorDataButton);
-
         System.out.println("LOG_CHK : " + this.getFilesDir());
+
+        activityButtons = new ArrayList<Button>();
+        activityButtons.add((Button)findViewById(R.id.walkingButton));
+        activityButtons.add((Button)findViewById(R.id.walkingUpstairsButton));
+        activityButtons.add((Button)findViewById(R.id.walkingDownstairsButton));
+        activityButtons.add((Button)findViewById(R.id.sittingButton));
+        activityButtons.add((Button)findViewById(R.id.standingButton));
+        activityButtons.add((Button)findViewById(R.id.layingButton));
     }
 
 
@@ -149,17 +158,25 @@ public class MainActivity extends Activity {
         mSensorManager.registerListener(mGyroListener, mGyroSensor, SAMPLING_RATE);
     }
 
-    public void startStopClick(View view) {
+    public void startStopClick(View view) throws IOException {
         Button startStopButton = (Button) view;
 
-        if (startStopButton.getText().toString().equalsIgnoreCase("start")) {
-            startStopButton.setText("STOP");
+        if (!onState) {
+            for(Button button : activityButtons) {
+                button.setEnabled(false);
+            }
+
+            startStopButton.setEnabled(true);
             startScraping();
-            mWriteSensorDataButton.setEnabled(false);
+            onState = true;
         } else {
-            startStopButton.setText("START");
-            mWriteSensorDataButton.setEnabled(true);
+            writeSensorData(startStopButton.getText().toString());
+
+            for(Button button : activityButtons) {
+                button.setEnabled(true);
+            }
             stopScraping();
+            onState = false;
         }
     }
 
@@ -170,23 +187,24 @@ public class MainActivity extends Activity {
         mSensorManager.unregisterListener(mGyroListener);
     }
 
-    public void writeSensorData(View view) throws IOException {
+    public void writeSensorData(String type) throws IOException {
         int numReadings = Math.min(Math.min(totalAccelerationReadings.size(), gravityReadings.size()),
                 Math.min(linearAccelerationReadings.size(), gyroReadings.size()));
 
         File path = Environment.getExternalStoragePublicDirectory("sensor_scraper");
         path.mkdirs();
 
+        String suffix = "_" + type + "_" + new Date().getTime() + ".txt";
         List<FileOutputStream> fileStreams = new ArrayList<FileOutputStream>();
-        fileStreams.add(new FileOutputStream(new File(path, "total_acc_x.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "total_acc_y.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "total_acc_z.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "body_acc_x.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "body_acc_y.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "body_acc_z.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_x.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_y.txt")));
-        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_z.txt")));
+        fileStreams.add(new FileOutputStream(new File(path, "total_acc_x" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "total_acc_y" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "total_acc_z" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "body_acc_x" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "body_acc_y" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "body_acc_z" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_x" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_y" + suffix)));
+        fileStreams.add(new FileOutputStream(new File(path, "body_gyro_z" + suffix)));
 
         int incrementCount = OVERLAP * WINDOW_SIZE / 100;
         for (int i = 0; i + WINDOW_SIZE < numReadings - 1; i += incrementCount) {
@@ -196,8 +214,6 @@ public class MainActivity extends Activity {
         }
 
         for (FileOutputStream fs : fileStreams) fs.close();
-
-        mWriteSensorDataButton.setEnabled(false);
     }
 
     private void writeToFileStreams(List<Reading> readings, List<FileOutputStream> fileStreams) throws IOException {
