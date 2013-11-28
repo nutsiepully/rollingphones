@@ -1,4 +1,10 @@
-function [ret] = sma(x,y,z)
+function [ret] = sma(x, y, z)
 %Signal magnitude area
-   ret = mean(abs(x)+abs(y)+abs(z), 2);
+
+    if nargin == 1
+        ret = mean(abs(x), 2);
+        return
+    end
+
+    ret = mean(abs(x) + abs(y) + abs(z), 2);
 end
