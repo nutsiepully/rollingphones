@@ -1,4 +1,4 @@
-function [features] = genFeatures(bax, bay, baz, bgx, bgy, bgz, tax, tay, taz)
+function [features, mR, rR] = genFeatures(bax, bay, baz, bgx, bgy, bgz, tax, tay, taz, minRow, rangeRow)
 % This function, when given a number of matricies representing the various
 % Readings of our accelerometer over a block of time,
 % Will generate a feature matrix
@@ -110,8 +110,23 @@ features = [
     angle([ ones(m, 1) zeros(m, 1) zeros(m, 1) ], gravityMean), ...
     angle([ ones(m, 1) zeros(m, 1) zeros(m, 1) ], gravityMean), ...
     ];
+    
 
-    features = normalize(features);
+    if nargout == 1
+        if nargin == 9
+            features = normalize(features);
+        else
+            features = normalize(features,  minRow, rangeRow);
+        end
+    else
+        if nargin == 9
+            [features, mR, rR] = normalize(features);
+        else
+            features = normalize(features);
+            mR = minRow;
+            rR = rangeRow;
+        end
+    end
 end
 
 % if time is 1, calculates time domain features, 
