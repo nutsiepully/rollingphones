@@ -111,18 +111,23 @@ features = [
     angle([ ones(m, 1) zeros(m, 1) zeros(m, 1) ], gravityMean), ...
     ];
     
-
+    isreal(features)
+    
     if nargout == 1
         if nargin == 9
+            fprintf('Normalizing\n');
             features = normalize(features);
         else
+            fprintf('Normallizing using input\n');
             features = normalize(features,  minRow, rangeRow);
         end
     else
         if nargin == 9
+            fprintf('Normalizing, computing rows\n');
             [features, mR, rR] = normalize(features);
         else
-            features = normalize(features);
+            fprintf('Normalizing, not recomputing rows\n')
+            features = normalize(features,minRow, rangeRow);
             mR = minRow;
             rR = rangeRow;
         end

@@ -8,7 +8,7 @@ load('genFeatures.mat');
 cV = 5;
 split = crossvalind('Kfold', size(Xtrain,1), cV);
 split = sort(split);
-
+%{
 for i = 1:cV
     trainSub = XgenTrain(split~=i, :);
     trainSubY = Ytrain(split~=i, :);
@@ -24,11 +24,17 @@ for i = 1:cV
     newacc2 = 100*mean(newlbl2 == testSubY);
     fprintf('HMM smoothing gives us %4.2f accuracy \n', newacc2);
 end
+%}
 
 fprintf('Training on Generated Train Features.\n');
 SVMStruct2 = svmtrain(Ytrain, XgenTrain, '-q');
 fprintf('Testing on Generated Test Features.\n');
 [lbl3, acc3, prob3] = svmpredict(Ytest ,XgenTest,SVMStruct2);
+XgenPC = XgenPhone;
+XgenPC(XgenPC >1) = 1;
+XgenPC(XgenPC <-1) = -1;
+[lbl32, acc32, prob32] = svmpredict(Yphone ,XgenPC,SVMStruct2);
+
 
 fprintf('Training on Given Features.\n');
 SVMStruct3 = svmtrain(Ytrain, Xtrain, '-q');

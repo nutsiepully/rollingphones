@@ -1,5 +1,5 @@
 function [norm_mat, mR, rR] = normalize( mat, minRow, rangeRow )
-    if nargin == 1
+    if nargin <2
          minRow = min(mat);
          rangeRow = max(mat) - min(mat);
     end
