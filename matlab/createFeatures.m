@@ -24,4 +24,7 @@ trSz = size(baztrain, 1);
 XgenTest = Xgen(1:teSz  , :);
 XgenTrain = Xgen((teSz+1):(teSz+trSz), :);
        
-save('genFeatures.mat', 'XgenTrain', 'XgenTest');
+XgenPhone = genFeatures(baxphone, bayphone, bazphone, bgxphone, ... 
+           bgyphone, bgzphone, taxphone, tayphone, tazphone, minRow, rangeRow);
+
+save('genFeatures.mat', 'XgenTrain', 'XgenTest', 'XgenPhone');
