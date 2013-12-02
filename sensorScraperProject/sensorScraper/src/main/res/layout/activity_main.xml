@@ -13,7 +13,7 @@
     <Button
         android:id="@+id/walkingButton"
         android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:onClick="startStopClick"
         android:text="WALKING"
         />
@@ -21,7 +21,7 @@
     <Button
         android:id="@+id/walkingUpstairsButton"
         android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:onClick="startStopClick"
         android:text="WALKING_UPSTAIRS"
         />
@@ -29,7 +29,7 @@
     <Button
         android:id="@+id/walkingDownstairsButton"
         android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:onClick="startStopClick"
         android:text="WALKING_DOWNSTAIRS"
         />
@@ -37,7 +37,7 @@
     <Button
         android:id="@+id/sittingButton"
         android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:onClick="startStopClick"
         android:text="SITTING"
         />
@@ -45,7 +45,7 @@
     <Button
         android:id="@+id/standingButton"
         android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:onClick="startStopClick"
         android:text="STANDING"
         />
@@ -53,9 +53,8 @@
     <Button
         android:id="@+id/layingButton"
         android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:onClick="startStopClick"
-        android:enabled="false"
         android:text="LAYING"
         />
 
