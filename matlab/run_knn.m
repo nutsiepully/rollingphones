@@ -1,4 +1,4 @@
-function run_knn( X_train, y_train, X_test, y_test, k, dist )
+function [ accuracy ] = run_knn( X_train, y_train, X_test, y_test, k, dist )
     if nargin < 5
         k = 10;
     end

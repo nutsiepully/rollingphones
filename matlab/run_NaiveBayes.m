@@ -1,4 +1,4 @@
-function run_NaiveBayes( X_train, y_train, X_test, y_test )
+function [accuracy] = run_NaiveBayes( X_train, y_train, X_test, y_test )
     model = NaiveBayes.fit(X_train, y_train);
     res = model.predict(X_test);
     

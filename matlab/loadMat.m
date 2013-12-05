@@ -26,3 +26,6 @@ bgztrain = importdata(strcat(trainfolder, 'Inertial Signals/body_gyro_z_train.tx
 taxtrain = importdata(strcat(trainfolder, 'Inertial Signals/total_acc_x_train.txt'));
 taytrain = importdata(strcat(trainfolder, 'Inertial Signals/total_acc_y_train.txt'));
 taztrain = importdata(strcat(trainfolder, 'Inertial Signals/total_acc_z_train.txt'));
+
+load('../datasets/UCI HAR Dataset/train/subject_train.txt');
+load('../datasets/UCI HAR Dataset/test/subject_test.txt');
